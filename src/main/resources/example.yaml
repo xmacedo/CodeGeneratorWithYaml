@@ -1,0 +1,23 @@
+classes:
+  - name: Person
+    fields:
+      - name: id
+        type: int
+        accessSpecifiers: public
+      - name: name
+        type: String
+        accessSpecifiers: private
+      - name: email
+        type: String
+        accessSpecifiers: protected
+  - name: Address
+    fields:
+      - name: street
+        type: String
+        accessSpecifiers: private
+      - name: city
+        type: String
+        accessSpecifiers: private
+      - name: postalCode
+        type: int
+        accessSpecifiers: private
