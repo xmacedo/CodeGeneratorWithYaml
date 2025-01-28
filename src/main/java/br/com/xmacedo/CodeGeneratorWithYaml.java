@@ -2,10 +2,12 @@ package br.com.xmacedo;
 
 import br.com.xmacedo.model.ClassDefinition;
 import br.com.xmacedo.model.Definitions;
+import br.com.xmacedo.model.FieldDefinition;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import java.io.File;
 import java.io.IOException;
+import static java.beans.NameGenerator.capitalize;
 
 public class CodeGeneratorWithYaml {
     public static void main(String[] args) {
@@ -17,20 +19,61 @@ public class CodeGeneratorWithYaml {
 
             Definitions definitions = mapper.readValue(new File("example.yaml"), Definitions.class);
 
+            //2. Interpreter the file
+            StringBuilder classToGenerate = new StringBuilder();
             for(ClassDefinition classDefinition : definitions.getClasses()) {
-                generateClasses(classDefinition);
+                classToGenerate = generateClasses(classDefinition);
             }
 
-            //2. Interpreter the file
+            //3. write file
 
-            //3. What is the file structure?
+
 
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private static void generateClasses(ClassDefinition classDefinition) {
-        //Generate as Is? Or whe can add Getter and setters?
+    // Generate a java class file based on the class definition
+    private static StringBuilder generateClasses(ClassDefinition classDefinition) {
+        StringBuilder classCodeToWriter = new StringBuilder();//first attempt
+
+
+        //imports
+
+        //class definition
+        classCodeToWriter.append("public class ").append(classDefinition.getName()).append(" {\n\n");
+
+        //fields
+        for (FieldDefinition field : classDefinition.getFields()) {
+            classCodeToWriter.append("    "+field.getAccessSpecifiers()+" ")//private-public-protected
+                    .append(field.getType())//string - boolean - int
+                    .append(" ")
+                    .append(field.getName())//nome
+                    .append(";\n");
+        }
+        //getter and setters
+        for (FieldDefinition field : classDefinition.getFields()) {
+            // Getter
+            classCodeToWriter.append("    public ").append(field.getType())
+                    .append(" get").append(changeToUpperCaseFirstLetter(field.getName())).append("() {\n")
+                    .append("        return ").append(field.getName()).append(";\n")
+                    .append("    }\n\n");
+
+            // Setter
+            classCodeToWriter.append("    public void set").append(capitalize(field.getName())).append("(")
+                    .append(field.getType()).append(" ").append(field.getName()).append(") {\n")
+                    .append("        this.").append(field.getName()).append(" = ").append(field.getName()).append(";\n")
+                    .append("    }\n\n");
+        }
+        return classCodeToWriter;
+    }
+
+    private static String changeToUpperCaseFirstLetter(String name) {
+        if (null != name && name.length() > 1) {
+            return name.substring(0, 1).toUpperCase() + name.substring(1);
+        }
+        return name;
+
     }
 }
