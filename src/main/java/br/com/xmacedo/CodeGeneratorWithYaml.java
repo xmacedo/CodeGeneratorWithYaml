@@ -7,7 +7,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import java.io.File;
 import java.io.IOException;
-import static java.beans.NameGenerator.capitalize;
 
 public class CodeGeneratorWithYaml {
     public static void main(String[] args) {
@@ -61,7 +60,7 @@ public class CodeGeneratorWithYaml {
                     .append("    }\n\n");
 
             // Setter
-            classCodeToWriter.append("    public void set").append(capitalize(field.getName())).append("(")
+            classCodeToWriter.append("    public void set").append(changeToUpperCaseFirstLetter(field.getName())).append("(")
                     .append(field.getType()).append(" ").append(field.getName()).append(") {\n")
                     .append("        this.").append(field.getName()).append(" = ").append(field.getName()).append(";\n")
                     .append("    }\n\n");
