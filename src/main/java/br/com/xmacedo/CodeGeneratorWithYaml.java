@@ -6,28 +6,34 @@ import br.com.xmacedo.model.FieldDefinition;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 
 public class CodeGeneratorWithYaml {
     public static void main(String[] args) {
-        System.out.println("Code Generator!");
+        System.out.println(">> Code Generator!");
 
         try {
             //1. Read file
             ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
 
-            Definitions definitions = mapper.readValue(new File("example.yaml"), Definitions.class);
+            Definitions definitions = mapper.readValue(new File("src/main/resources/example.yaml"), Definitions.class);
 
             //2. Interpreter the file
             StringBuilder classToGenerate = new StringBuilder();
-            for(ClassDefinition classDefinition : definitions.getClasses()) {
+            for (ClassDefinition classDefinition : definitions.getClasses()) {
                 classToGenerate = generateClasses(classDefinition);
+
+                //3. write file
+                try (FileWriter writer = new FileWriter(classDefinition.getName() + ".java")) {
+                    writer.write(classToGenerate.toString());
+                    System.out.println("Generated class: " + classDefinition.getName() + ".java");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
 
-            //3. write file
-
-
-
+            System.out.println("<<< Code Generated!");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -37,15 +43,14 @@ public class CodeGeneratorWithYaml {
     private static StringBuilder generateClasses(ClassDefinition classDefinition) {
         StringBuilder classCodeToWriter = new StringBuilder();//first attempt
 
-
-        //imports
+        //imports ?
 
         //class definition
         classCodeToWriter.append("public class ").append(classDefinition.getName()).append(" {\n\n");
 
         //fields
         for (FieldDefinition field : classDefinition.getFields()) {
-            classCodeToWriter.append("    "+field.getAccessSpecifiers()+" ")//private-public-protected
+            classCodeToWriter.append("    " + field.getAccessSpecifiers() + " ")//private-public-protected
                     .append(field.getType())//string - boolean - int
                     .append(" ")
                     .append(field.getName())//nome
@@ -54,6 +59,7 @@ public class CodeGeneratorWithYaml {
         //getter and setters
         for (FieldDefinition field : classDefinition.getFields()) {
             // Getter
+            classCodeToWriter.append("\n");
             classCodeToWriter.append("    public ").append(field.getType())
                     .append(" get").append(changeToUpperCaseFirstLetter(field.getName())).append("() {\n")
                     .append("        return ").append(field.getName()).append(";\n")
@@ -63,8 +69,12 @@ public class CodeGeneratorWithYaml {
             classCodeToWriter.append("    public void set").append(changeToUpperCaseFirstLetter(field.getName())).append("(")
                     .append(field.getType()).append(" ").append(field.getName()).append(") {\n")
                     .append("        this.").append(field.getName()).append(" = ").append(field.getName()).append(";\n")
-                    .append("    }\n\n");
+                    .append("    }\n");
         }
+
+        //End of file
+        classCodeToWriter.append("}");
+
         return classCodeToWriter;
     }
 
