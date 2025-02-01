@@ -13,6 +13,9 @@ classes:
       - name: email
         type: String
         accessSpecifiers: protected
+      - name: birthDate
+        type: java.util.Date
+        accessSpecifiers: private
   - name: Address
     fields:
       - name: street
