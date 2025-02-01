@@ -1,7 +1,4 @@
 classes:
-  - library:
-      java.util.Date
-      java.lang.Math
   - name: Person
     fields:
       - name: id
