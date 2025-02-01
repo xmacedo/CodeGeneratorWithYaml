@@ -44,6 +44,10 @@ public class CodeGeneratorWithYaml {
         StringBuilder classCodeToWriter = new StringBuilder();//first attempt
 
         //imports ?
+        for (String library : classDefinition.getLibrary()) {
+            classCodeToWriter.append("import " + library + ";")
+                    .append("\n");
+        }
 
         //class definition
         classCodeToWriter.append("public class ").append(classDefinition.getName()).append(" {\n\n");
