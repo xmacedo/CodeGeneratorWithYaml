@@ -75,6 +75,7 @@ public class CodeGeneratorWithYaml {
                     .append("        this.").append(field.getName()).append(" = ").append(field.getName()).append(";\n")
                     .append("    }\n");
         }
+        //To String?
 
         //End of file
         classCodeToWriter.append("}");
