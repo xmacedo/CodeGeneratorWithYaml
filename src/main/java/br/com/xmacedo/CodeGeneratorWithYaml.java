@@ -8,8 +8,14 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Set;
 
 public class CodeGeneratorWithYaml {
+
+    private static final String FOLDER_TO_GENERATED_CLASS = "class-generated/";
+    private static final String PACKAGE_NAME = "br.com.xmacedo";
+    private static final String FOLDER_TO_GET_YAML_FILES = "src/main/resources/";
+
     public static void main(String[] args) {
         System.out.println(">> Code Generator!");
 
@@ -17,7 +23,7 @@ public class CodeGeneratorWithYaml {
             //1. Read file
             ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
 
-            Definitions definitions = mapper.readValue(new File("src/main/resources/example.yaml"), Definitions.class);
+            Definitions definitions = mapper.readValue(new File(FOLDER_TO_GET_YAML_FILES + "example.yaml"), Definitions.class);
 
             //2. Interpreter the file
             StringBuilder classToGenerate = new StringBuilder();
@@ -25,7 +31,7 @@ public class CodeGeneratorWithYaml {
                 classToGenerate = generateClasses(classDefinition);
 
                 //3. write file
-                try (FileWriter writer = new FileWriter(classDefinition.getName() + ".java")) {
+                try (FileWriter writer = new FileWriter(FOLDER_TO_GENERATED_CLASS + classDefinition.getName() + ".java")) {
                     writer.write(classToGenerate.toString());
                     System.out.println("Generated class: " + classDefinition.getName() + ".java");
                 } catch (IOException e) {
@@ -43,11 +49,17 @@ public class CodeGeneratorWithYaml {
     private static StringBuilder generateClasses(ClassDefinition classDefinition) {
         StringBuilder classCodeToWriter = new StringBuilder();//first attempt
 
-        //imports ?
-        for (String library : classDefinition.getLibrary()) {
-            classCodeToWriter.append("import " + library + ";")
-                    .append("\n");
+        //package
+        classCodeToWriter.append("package " + PACKAGE_NAME + ";").append("\n\n");
+
+        //imports
+        for (FieldDefinition field : classDefinition.getFields()) {
+            if (!isPrimitive(field.getType()) && !isJavaLang(field.getType())) {
+                classCodeToWriter.append("import " + field.getType() + ";").append("\n");
+            }
         }
+        //Nem blank line to divide imports from class name
+        classCodeToWriter.append("\n");
 
         //class definition
         classCodeToWriter.append("public class ").append(classDefinition.getName()).append(" {\n\n");
@@ -75,8 +87,6 @@ public class CodeGeneratorWithYaml {
                     .append("        this.").append(field.getName()).append(" = ").append(field.getName()).append(";\n")
                     .append("    }\n");
         }
-        //To String?
-
         //End of file
         classCodeToWriter.append("}");
 
@@ -88,6 +98,15 @@ public class CodeGeneratorWithYaml {
             return name.substring(0, 1).toUpperCase() + name.substring(1);
         }
         return name;
-
     }
+
+    private static boolean isPrimitive(String type) {
+        return Set.of("int", "double", "float", "boolean", "char", "byte", "short", "long").contains(type);
+    }
+
+    private static boolean isJavaLang(String type) {
+        return Set.of("String", "Integer", "Double", "Float", "Boolean", "Character", "Byte", "Short", "Long").contains(type);
+    }
+
+
 }
