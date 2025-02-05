@@ -12,6 +12,7 @@ target/
 *.iml
 *.ipr
 .idea
+class-generated/*
 
 ### Eclipse ###
 .apt_generated
