@@ -13,6 +13,9 @@ classes:
       - name: birthDate
         type: java.util.Date
         accessSpecifiers: private
+      - name: Address
+        type: br.com.xmacedo.Address
+        accessSpecifiers: private
   - name: Address
     fields:
       - name: street

@@ -51,15 +51,18 @@ public class CodeGeneratorWithYaml {
 
         //package
         classCodeToWriter.append("package " + PACKAGE_NAME + ";").append("\n\n");
-
+        boolean blankLine = false;
         //imports
         for (FieldDefinition field : classDefinition.getFields()) {
             if (!isPrimitive(field.getType()) && !isJavaLang(field.getType())) {
                 classCodeToWriter.append("import " + field.getType() + ";").append("\n");
             }
+            blankLine = true;
         }
         //Nem blank line to divide imports from class name
-        classCodeToWriter.append("\n");
+        if(!blankLine) {
+            classCodeToWriter.append("\n");
+        }
 
         //class definition
         classCodeToWriter.append("public class ").append(classDefinition.getName()).append(" {\n\n");
