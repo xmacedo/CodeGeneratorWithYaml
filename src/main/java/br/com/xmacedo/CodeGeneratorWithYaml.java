@@ -56,11 +56,12 @@ public class CodeGeneratorWithYaml {
         for (FieldDefinition field : classDefinition.getFields()) {
             if (!isPrimitive(field.getType()) && !isJavaLang(field.getType())) {
                 classCodeToWriter.append("import " + field.getType() + ";").append("\n");
+                blankLine = true;
             }
-            blankLine = true;
+
         }
         //Nem blank line to divide imports from class name
-        if(!blankLine) {
+        if(blankLine) {
             classCodeToWriter.append("\n");
         }
 
